@@ -1,20 +1,70 @@
 import { Button, CircularProgress, Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
-import { useSnackbar } from "notistack";
+import { useSnackbar, SnackbarProvider } from "notistack";
 import React, { useState } from "react";
 import { config } from "../App";
 import Footer from "./Footer";
 import Header from "./Header";
 import "./Register.css";
 
-const Register = () => {
+const Register = (props) => {
   const { enqueueSnackbar } = useSnackbar();
+  const [isProcessing, setProcess] = useState(false);
+  const [userRegistration, setUserRegistration] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
 
+  const handleInput = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+
+    setUserRegistration({ ...userRegistration, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (validateInput(userRegistration)) {
+      setProcess(true);
+
+      var body = {
+        username: userRegistration.username,
+        password: userRegistration.password,
+      };
+
+      const url = config.endpoint + "/auth/register";
+      axios({
+        method: "post",
+        url: url,
+        data: body,
+      })
+        .then(function (response) {
+          enqueueSnackbar("Registered successfully", { variant: "success" });
+          setProcess(false);
+        })
+        .catch(function (error) {
+          console.log(error.response);
+          if (error.response === undefined)
+            enqueueSnackbar(
+              "Something went wrong. Check that the backend is running, reachable and returns valid JSON.",
+              { variant: "error" }
+            );
+          else if (error.response.status === 400)
+            enqueueSnackbar(`${error.response.data.message}`, {
+              variant: "error",
+            });
+          setProcess(false);
+        });
+    }
+  };
 
   // TODO: CRIO_TASK_MODULE_REGISTER - Implement the register function
   /**
    * Definition for register handler
+   *
    * - Function to be called when the user clicks on the register button or submits the register form
    *
    * @param {{ username: string, password: string, confirmPassword: string }} formData
@@ -35,8 +85,8 @@ const Register = () => {
    *      "message": "Username is already taken"
    * }
    */
-  const register = async (formData) => {
-  };
+
+  const register = async (formData) => {};
 
   // TODO: CRIO_TASK_MODULE_REGISTER - Implement user input validation logic
   /**
@@ -57,6 +107,60 @@ const Register = () => {
    * -    Check that confirmPassword field has the same value as password field - Passwords do not match
    */
   const validateInput = (data) => {
+    var flag = false;
+    if (data.username === "") {
+      enqueueSnackbar("Username is a required field", { variant: "warning" });
+      return flag;
+    } else if (data.username.length < 6) {
+      enqueueSnackbar("Username must be at least 6 characters", {
+        variant: "warning",
+      });
+      return flag;
+    } else if (data.password === "") {
+      enqueueSnackbar("Password is a required field", { variant: "warning" });
+      return flag;
+    } else if (data.password.length < 6) {
+      enqueueSnackbar("Password must be at least 6 characters", {
+        variant: "warning",
+      });
+      return flag;
+    } else if (data.password !== data.confirmPassword) {
+      enqueueSnackbar("Passwords do not match", { variant: "warning" });
+      return flag;
+    } else {
+      return true;
+    }
+
+    /**
+     * Validate the input values so that any bad or illegal values are not passed to the backend.
+     *
+     * @param {{ username: string, password: string, confirmPassword: string }} data
+     *  Object with values of username, password and confirm password user entered to register
+     *
+     * @returns {boolean}
+     *    Whether validation has passed or not
+     */
+  };
+
+  const renderAuthButton = () => {
+    if (!isProcessing) {
+      return (
+        <Button
+          className="button"
+          variant="contained"
+          type="submit"
+          onClick={handleSubmit}
+        >
+          Register Now
+        </Button>
+      );
+    } else {
+      return (
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <CircularProgress color="inherit" />
+        </div>
+      );
+    }
   };
 
   return (
@@ -77,6 +181,8 @@ const Register = () => {
             title="Username"
             name="username"
             placeholder="Enter Username"
+            value={userRegistration.username}
+            onChange={handleInput}
             fullWidth
           />
           <TextField
@@ -88,6 +194,8 @@ const Register = () => {
             helperText="Password must be atleast 6 characters length"
             fullWidth
             placeholder="Enter a password with minimum 6 characters"
+            value={userRegistration.password}
+            onChange={handleInput}
           />
           <TextField
             id="confirmPassword"
@@ -96,15 +204,25 @@ const Register = () => {
             name="confirmPassword"
             type="password"
             fullWidth
+            value={userRegistration.confirmPassword}
+            onChange={handleInput}
           />
-           <Button className="button" variant="contained">
+          {renderAuthButton()}
+
+          {/* <Button
+            className="button"
+            variant="contained"
+            type="submit"
+            onClick={handleSubmit}
+          >
             Register Now
-           </Button>
+          </Button>
+          <CircularProgress /> */}
           <p className="secondary-action">
             Already have an account?{" "}
-             <a className="link" href="#">
+            <a className="link" href="#">
               Login here
-             </a>
+            </a>
           </p>
         </Stack>
       </Box>
