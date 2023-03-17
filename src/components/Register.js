@@ -1,8 +1,9 @@
 import { Button, CircularProgress, Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
-import { useSnackbar, SnackbarProvider } from "notistack";
+import { useSnackbar } from "notistack";
 import React, { useState } from "react";
+import { useHistory, Link } from "react-router-dom";
 import { config } from "../App";
 import Footer from "./Footer";
 import Header from "./Header";
@@ -16,6 +17,8 @@ const Register = (props) => {
     password: "",
     confirmPassword: "",
   });
+
+  const history = useHistory()
 
   const handleInput = (e) => {
     const name = e.target.name;
@@ -44,6 +47,7 @@ const Register = (props) => {
         .then(function (response) {
           enqueueSnackbar("Registered successfully", { variant: "success" });
           setProcess(false);
+          history.push("/login")
         })
         .catch(function (error) {
           console.log(error.response);
@@ -150,6 +154,7 @@ const Register = (props) => {
           variant="contained"
           type="submit"
           onClick={handleSubmit}
+          
         >
           Register Now
         </Button>
@@ -220,9 +225,9 @@ const Register = (props) => {
           <CircularProgress /> */}
           <p className="secondary-action">
             Already have an account?{" "}
-            <a className="link" href="#">
+            <Link className="link" to="/login">
               Login here
-            </a>
+            </Link>
           </p>
         </Stack>
       </Box>
