@@ -144,10 +144,15 @@ const Products = () => {
    *
    */
   const debounceSearch = (event, debounceTimeout) => {
-    clearTimeout(debounceTimeout)
-    let timer = setTimeout(()=> {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    const timeout = setTimeout(() => {
       performSearch(event.target.value);
-    },3000)
+    }, 500);
+
+    setDebounceTimeout(timeout);
     
   };
 
