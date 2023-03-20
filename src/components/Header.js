@@ -5,9 +5,18 @@ import { useHistory, Link } from "react-router-dom";
 import Box from "@mui/material/Box";
 import React from "react";
 import "./Header.css";
+import {
+  CircularProgress,
+  Grid,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
+import { Search, SentimentDissatisfied } from "@mui/icons-material";
+
 // import "./Register.css"
 
-const Header = ({ children, hasHiddenAuthButtons }) => {
+const Header = ({children, hasHiddenAuthButtons }) => {
+  // console.log(searchQuery, onSearchQueryChange);
   const history = useHistory();
 
   const token = localStorage.getItem("token");
@@ -24,6 +33,9 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
       <Box className="header-title">
         <img src="logo_light.svg" alt="QKart-icon"></img>
       </Box>
+      {
+        children
+      }
       {hasHiddenAuthButtons && (
         <Button
           className="explore-button"
@@ -39,6 +51,7 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
 
       {!hasHiddenAuthButtons && !token && (
         <Stack spacing={2} direction="row">
+           
           <Button variant="text" 
           onClick={() => {
             history.push("/login", {from: "Header"})
