@@ -23,6 +23,9 @@ function App() {
             <Route path="/register">
               <Register />
             </Route>
+            <Route path="/checkout">
+              Checkout
+            </Route>
           </Switch>
     </div>
   );
