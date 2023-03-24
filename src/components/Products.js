@@ -64,43 +64,7 @@ const Products = () => {
     // performSearch(searchQuery)
   }
 
-  // TODO: CRIO_TASK_MODULE_PRODUCTS - Fetch products data and store it
-  /**
-   * Make API call to get the products list and store it to display the products
-   *
-   * @returns { Array.<Product> }
-   *      Array of objects with complete data on all available products
-   *
-   * API endpoint - "GET /products"
-   *
-   * Example for successful response from backend:
-   * HTTP 200
-   * [
-   *      {
-   *          "name": "iPhone XR",
-   *          "category": "Phones",
-   *          "cost": 100,
-   *          "rating": 4,
-   *          "image": "https://i.imgur.com/lulqWzW.jpg",
-   *          "_id": "v4sLtEcMpzabRyfx"
-   *      },
-   *      {
-   *          "name": "Basketball",
-   *          "category": "Sports",
-   *          "cost": 100,
-   *          "rating": 5,
-   *          "image": "https://i.imgur.com/lulqWzW.jpg",
-   *          "_id": "upLK9JbQ4rMhTwt4"
-   *      }
-   * ]
-   *
-   * Example for failed response from backend:
-   * HTTP 500
-   * {
-   *      "success": false,
-   *      "message": "Something went wrong. Check the backend console for more details"
-   * }
-   */
+ 
 
   useEffect(() => {
     performAPICall();
@@ -347,14 +311,7 @@ const Products = () => {
                   padding: "2px",
                 }}
               >
-                {token && cartData.length === 0 && (
-                  <div>
-                    <ShoppingCartIcon />
-                    <p style={{ textAlign: "center", color: "grey" }}>
-                      Cart is empty. Add more items to the cart to checkout.
-                    </p>
-                  </div>
-                )}
+                
 
                 {token && (
                   <Grid item>

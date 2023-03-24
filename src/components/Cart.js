@@ -51,8 +51,8 @@ import { config } from "../App";
  */
 export const generateCartItemsFrom = (cartData, productsData) => {
   const cartProducts = productsData.filter((product) => {
-    for(let item of cartData){
-      if(item.productId === product._id){
+    for (let item of cartData) {
+      if (item.productId === product._id) {
         product.qty = item.qty;
         return true;
       }
@@ -75,9 +75,17 @@ export const generateCartItemsFrom = (cartData, productsData) => {
 export const getTotalCartValue = (items = []) => {
   let cost = 0;
   items.forEach((item) => {
-    cost = cost + (item.cost*item.qty );
+    cost = cost + item.cost * item.qty;
   });
   return cost;
+};
+
+const getTotalItems = (items = []) => {
+  let total = 0;
+  items.forEach((item) => {
+    total += item.qty;
+  });
+  return total;
 };
 /**
  * Component to display the current quantity for a product and + and - buttons to update product quantity on cart
@@ -94,25 +102,28 @@ export const getTotalCartValue = (items = []) => {
  *
  */
 
-
-const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
-
-
-
+const ItemQuantity = ({ value, handleAdd, handleDelete, ReadOnly }) => {
   return (
     <Stack direction="row" alignItems="center">
-      <IconButton size="small" color="primary" onClick={handleDelete}>
-        <RemoveOutlined />
-      </IconButton>
+      {!ReadOnly && (
+        <IconButton size="small" color="primary" onClick={handleDelete}>
+          <RemoveOutlined />
+        </IconButton>
+      )}
+      {ReadOnly && <p>Qty:</p>}
       <Box padding="0.5rem" data-testid="item-qty">
         {value}
       </Box>
-      <IconButton size="small" color="primary" onClick={handleAdd}>
-        <AddOutlined />
-      </IconButton>
+      {!ReadOnly && (
+        <IconButton size="small" color="primary" onClick={handleAdd}>
+          <AddOutlined />
+        </IconButton>
+      )}
     </Stack>
   );
 };
+
+const OrderDetails = () => {};
 
 /**
  * Component to display the Cart view
@@ -128,10 +139,10 @@ const ItemQuantity = ({ value, handleAdd, handleDelete }) => {
  *
  *
  */
-const Cart = ({ products, items = [], handleQuantity }) => {
-
+const Cart = ({ products, items = [], handleQuantity, isReadOnly }) => {
   const history = useHistory();
-  
+  const shippingCharges = 0
+
   if (!items.length) {
     return (
       <Box className="cart empty">
@@ -144,8 +155,8 @@ const Cart = ({ products, items = [], handleQuantity }) => {
   }
 
   const handleCheckoutRedirect = () => {
-    history.push("/checkout", {from: "Cart"})
-  }
+    history.push("/checkout", { from: "Cart" });
+  };
 
   return (
     <>
@@ -177,12 +188,14 @@ const Cart = ({ products, items = [], handleQuantity }) => {
                 alignItems="center"
               >
                 <ItemQuantity
-                // Add required props by checking implementation
-                handleAdd={() => handleQuantity(item._id, item.qty+1)} handleDelete={() => handleQuantity(item._id, item.qty-1)} value={item.qty}
-               
+                  // Add required props by checking implementation
+                  handleAdd={() => handleQuantity(item._id, item.qty + 1)}
+                  handleDelete={() => handleQuantity(item._id, item.qty - 1)}
+                  value={item.qty}
+                  ReadOnly={isReadOnly}
                 />
                 <Box padding="0.5rem" fontWeight="700">
-                ${item.cost}
+                  ${item.cost}
                 </Box>
               </Box>
             </Box>
@@ -207,19 +220,70 @@ const Cart = ({ products, items = [], handleQuantity }) => {
             ${getTotalCartValue(items)}
           </Box>
         </Box>
-
-        <Box display="flex" justifyContent="flex-end" className="cart-footer">
-          <Button
-            color="primary"
-            variant="contained"
-            startIcon={<ShoppingCart />}
-            className="checkout-btn"
-            onClick={handleCheckoutRedirect}
-          >
-            Checkout
-          </Button>
-        </Box>
+        {!isReadOnly && (
+          <Box display="flex" justifyContent="flex-end" className="cart-footer">
+            <Button
+              color="primary"
+              variant="contained"
+              startIcon={<ShoppingCart />}
+              className="checkout-btn"
+              onClick={handleCheckoutRedirect}
+            >
+              Checkout
+            </Button>
+          </Box>
+        )}
       </Box>
+      {isReadOnly && (
+        <Box className="cart">
+          <Box
+            color="#3C3C3C"
+            fontWeight="700"
+            fontSize="1.5rem"
+            alignSelf="center"
+            padding="1rem"
+          >
+            Order details
+          </Box>
+          <Box
+            sx={{ px: 3, py: 1 }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>Products</Box>
+            <Box>{getTotalItems(items)}</Box>
+          </Box>
+          <Box
+           sx={{ px: 3, py: 1 }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>Subtotal</Box>
+            <Box>{getTotalCartValue(items)}</Box>
+          </Box>
+          <Box
+            sx={{ px: 3, py: 1 }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Box>Shipping Charges</Box>
+            <Box>${shippingCharges}</Box>
+          </Box>
+          <Box
+            sx={{ px: 3, py: 1 }}
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            fontWeight="700"
+          >
+            <Box>Total</Box>
+            <Box>${getTotalCartValue(items) + shippingCharges}</Box>
+          </Box>
+        </Box>
+      )}
     </>
   );
 };
